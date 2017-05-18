@@ -21,6 +21,8 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
 
   val isoLocales = Map(Locale.getISOCountries.map(c => c -> new Locale("", c)): _*)
 
+  var holidays: Either[Throwable, Set[Holiday]] = _
+
   stage = new PrimaryStage {
     maximized = false
     scene = new Scene {
@@ -41,17 +43,8 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
                   null
             }
             onAction = _ => {
-              holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
-              sum.text = holidays match {
-                case Right(h) =>
-                  getDays(
-                    dps.head.value.value, dps.last.value.value)
-                    .filterNot(d => h.map(_.date).contains(d))
-                    .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
-                    .sum
-                    .toString
-                case Left(_) => "Error"
-              }
+              updateHolidays(dps, locales)
+              updateSum(sum, dps, hours)
             }
           }
 
@@ -59,21 +52,12 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
           margin = Insets(20)
           value = Locale.getDefault().getCountry
           onAction = _ => {
-            holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(value.value).getISO3Country)
-            sum.text = holidays match {
-              case Right(h) =>
-                getDays(
-                  dps.head.value.value, dps.last.value.value)
-                  .filterNot(d => h.map(_.date).contains(d))
-                  .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
-                  .sum
-                  .toString
-              case Left(_) => "Error"
-            }
+            updateHolidays(dps, this)
+            updateSum(sum, dps, hours)
           }
         }
 
-        var holidays: Either[Throwable, Set[Holiday]] = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
+        updateHolidays(dps, locales)
 
         val sum = new Label {
           margin = Insets(20)
@@ -85,28 +69,10 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
             margin = Insets(10)
             maxWidth = 75
             onMouseClicked = _ =>
-              sum.text = holidays match {
-                case Right(h) =>
-                  getDays(
-                    dps.head.value.value, dps.last.value.value)
-                    .filterNot(d => h.map(_.date).contains(d))
-                    .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
-                    .sum
-                    .toString
-                case Left(_) => "Error"
-              }
+              updateSum(sum, dps, hours)
 
             onKeyReleased = _ =>
-              sum.text = holidays match {
-                case Right(h) =>
-                  getDays(
-                    dps.head.value.value, dps.last.value.value)
-                    .filterNot(d => h.map(_.date).contains(d))
-                    .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
-                    .sum
-                    .toString
-                case Left(_) => "Error"
-              }
+              updateSum(sum, dps, hours)
           }
         val days: Seq[Label] =
           for (i <- 1 to 7) yield new Label(DayOfWeek.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()))
@@ -128,4 +94,19 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
       }
     }
   }
+
+  private def updateHolidays(dps: Seq[DatePicker], locales: ComboBox[String]) =
+    holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
+
+  private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
+    sum.text = holidays match {
+      case Right(h) =>
+        getDays(
+          dps.head.value.value, dps.last.value.value)
+          .filterNot(d => h.map(_.date).contains(d))
+          .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
+          .sum
+          .toString
+      case Left(_) => "Error"
+    }
 }
