@@ -40,13 +40,37 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
                 else
                   null
             }
-            onAction = _ => holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
+            onAction = _ => {
+              holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
+              sum.text = holidays match {
+                case Right(h) =>
+                  getDays(
+                    dps.head.value.value, dps.last.value.value)
+                    .filterNot(d => h.map(_.date).contains(d))
+                    .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
+                    .sum
+                    .toString
+                case Left(_) => "Error"
+              }
+            }
           }
 
         val locales = new ComboBox[String](Locale.getISOCountries) {
           margin = Insets(20)
           value = Locale.getDefault().getCountry
-          onAction = _ => holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(value.value).getISO3Country)
+          onAction = _ => {
+            holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(value.value).getISO3Country)
+            sum.text = holidays match {
+              case Right(h) =>
+                getDays(
+                  dps.head.value.value, dps.last.value.value)
+                  .filterNot(d => h.map(_.date).contains(d))
+                  .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
+                  .sum
+                  .toString
+              case Left(_) => "Error"
+            }
+          }
         }
 
         var holidays: Either[Throwable, Set[Holiday]] = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
