@@ -61,7 +61,6 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
 
         val sum = new Label {
           margin = Insets(20)
-          text = dps.head.value.value.toString
         }
         val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
