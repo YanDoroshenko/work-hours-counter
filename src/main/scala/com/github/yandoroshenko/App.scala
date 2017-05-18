@@ -19,7 +19,7 @@ import scalafx.util.StringConverter
 
 object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounter {
 
-  val isoLocales = Map(Locale.getISOCountries.map(c => c -> new Locale("", c)): _*)
+  val countries = Map(Locale.getISOCountries.map(c => new Locale("", c).getDisplayCountry -> new Locale("", c)): _*)
 
   var holidays: Either[Throwable, Set[Holiday]] = _
 
@@ -48,9 +48,10 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
             }
           }
 
-        val locales = new ComboBox[String](Locale.getISOCountries) {
+        val locales = new ComboBox[String](countries.keys.toList.sorted) {
           margin = Insets(20)
-          value = Locale.getDefault().getCountry
+          maxWidth = 159
+          value = Locale.getDefault().getDisplayCountry
           onAction = _ => {
             updateHolidays(dps, this)
             updateSum(sum, dps, hours)
@@ -91,7 +92,7 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
   }
 
   private def updateHolidays(dps: Seq[DatePicker], locales: ComboBox[String]) =
-    holidays = getHolidays(dps.head.value.value, dps.last.value.value, isoLocales(locales.value.value).getISO3Country)
+    holidays = getHolidays(dps.head.value.value, dps.last.value.value, countries(locales.value.value).getISO3Country)
 
   private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
     sum.text = holidays match {
