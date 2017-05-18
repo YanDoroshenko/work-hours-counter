@@ -26,8 +26,8 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
     scene = new Scene {
       title = "Work Hours Count"
       content = new VBox {
-        val dps: Seq[DatePicker] = for (i <- 1 to 2) yield
-          new DatePicker(LocalDate.now().withDayOfMonth(1)) {
+        val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
+          new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
             margin = Insets(20)
             converter = new StringConverter[LocalDate] {
               private final val f = DateTimeFormatter.ofPattern("dd.MM.yyyy")
