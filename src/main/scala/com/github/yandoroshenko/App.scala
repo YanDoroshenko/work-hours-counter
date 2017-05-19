@@ -13,6 +13,8 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, VBox}
+import scalafx.scene.paint.Color
+import scalafx.scene.paint.Color._
 import scalafx.util.StringConverter
 
 /**
@@ -78,6 +80,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
         val sum = new Label {
           margin = Insets(20)
+          style = "-fx-font-size: 48pt"
         }
         val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
@@ -103,6 +106,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             })
           },
           new HBox {
+            alignment = Pos.Center
             children = Seq(sum)
           }
         )
@@ -115,7 +119,9 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
   private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
     sum.text = holidays match {
-      case Right(hs) =>
+      case Right(hs) => {
+        sum.style = "-fx-font-size: 48pt"
+        sum.textFill = Color.web("#303030")
         getDays(
           dps.head.value.value, dps.last.value.value)
           .filterNot(d => hs.map(_.date).contains(d))
@@ -132,9 +138,14 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           case w if w.isWhole => w.toInt.toString
           case f => f.toString
         }
-
-      case Left(_: JsResultException) => "Sorry, selected country is not supported"
-      case Left(_: IOException) => "Can't load holidays"
-      case Left(_) => "Error occured"
+      }
+      case Left(e) =>
+        sum.style = null
+        sum.textFill = Red
+        e match {
+          case _: JsResultException => "Sorry, selected country is not supported"
+          case _: IOException => "Can't load holidays"
+          case _ => "Error occured"
+        }
     }
 }
