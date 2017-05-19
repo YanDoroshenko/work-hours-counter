@@ -128,8 +128,11 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             case h => h.value.value
           }
           )
-          .sum
-          .toString
+          .sum match {
+          case w if w.isWhole => w.toInt.toString
+          case f => f.toString
+        }
+
       case Left(_: JsResultException) => "Sorry, selected country is not supported"
       case Left(_: IOException) => "Can't load holidays"
       case Left(_) => "Error occured"
