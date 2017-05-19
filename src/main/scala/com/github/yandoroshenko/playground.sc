@@ -14,4 +14,5 @@ Try(Json.parse(io.Source.fromURL(url).mkString).as[JsArray]) match {
         (v._1 \ "month").as[JsNumber].value.toIntExact,
         (v._1 \ "day").as[JsNumber].value.toInt)))
   case Failure(e) => Left(e)
-}
+};
+javafx.scene.text.Font.getFamilies.asScala.mkString("\n")
