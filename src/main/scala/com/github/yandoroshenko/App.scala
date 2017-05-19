@@ -20,7 +20,7 @@ import scalafx.util.StringConverter
   */
 
 
-object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounter {
+object App extends JFXApp with Calendar with HolidayCalendar {
 
   val countries = Map(Locale.getISOCountries.map(c => new Locale("", c).getDisplayCountry -> new Locale("", c)): _*)
 
