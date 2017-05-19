@@ -1,14 +1,17 @@
 package com.github.yandoroshenko
 
+import java.io.IOException
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.time.{DayOfWeek, LocalDate}
 import java.util.Locale
+
+import play.api.libs.json.JsResultException
 
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
-import scalafx.scene.control.{ComboBox, DatePicker, Label, Spinner}
+import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.util.StringConverter
 
@@ -103,6 +106,8 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
           .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
           .sum
           .toString
-      case Left(_) => "Error"
+      case Left(_: JsResultException) => "Sorry, selected country is not supported"
+      case Left(_: IOException) => "Can't load holidays"
+      case Left(_) => "Error occured"
     }
 }
