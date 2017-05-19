@@ -31,9 +31,22 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
     scene = new Scene {
       title = "Work Hours Count"
       content = new VBox {
+        val fullTimeSelection = new ToggleGroup()
+        val fullTime = for (i <- 1 to 2) yield
+          new RadioButton {
+            margin = Insets(10, 20, 20, 20)
+            text = if (i % 2 == 0) "Part time" else "Full time"
+            toggleGroup = fullTimeSelection
+            selected = i % 2 == 0
+            onAction = _ => {
+              hours.foreach(h => h.disable = text.value == "Full time")
+              updateSum(sum, dps, hours)
+            }
+          }
+
         val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
           new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
-            margin = Insets(20)
+            margin = Insets(10)
             converter = new StringConverter[LocalDate] {
               private final val f = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
@@ -52,8 +65,8 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
           }
 
         val locales = new ComboBox[String](countries.keys.toList.sorted) {
-          margin = Insets(20)
-          maxWidth = 159
+          margin = Insets(10)
+          maxWidth = 209
           value = Locale.getDefault().getDisplayCountry
           onAction = _ => {
             updateHolidays(dps, this)
@@ -78,7 +91,10 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
 
         children = Seq(
           new HBox {
-            children = List(dps.head, dps.last, locales)
+            children = dps :+ locales
+          },
+          new HBox {
+            children = fullTime
           },
           new HBox {
             children = hours.zip(days).map(p => new VBox {
@@ -99,11 +115,19 @@ object App extends JFXApp with Calendar with HolidayCalendar with WorkHourCounte
 
   private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
     sum.text = holidays match {
-      case Right(h) =>
+      case Right(hs) =>
         getDays(
           dps.head.value.value, dps.last.value.value)
-          .filterNot(d => h.map(_.date).contains(d))
-          .map(d => hours(d.getDayOfWeek.getValue - 1).value.value)
+          .filterNot(d => hs.map(_.date).contains(d))
+          .map(d => hours(d.getDayOfWeek.getValue - 1) match {
+            case h if h.disabled.value =>
+              if (d.getDayOfWeek.getValue < 6)
+                8
+              else
+                0
+            case h => h.value.value
+          }
+          )
           .sum
           .toString
       case Left(_: JsResultException) => "Sorry, selected country is not supported"
