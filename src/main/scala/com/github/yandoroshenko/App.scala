@@ -49,22 +49,22 @@ object App extends JFXApp with Calendar with HolidayCalendar {
                   null
             }
             onAction = _ => {
-              updateHolidays(dps, locales)
+              updateHolidays(dps, considerHolidays, locales)
               updateSum(sum, dps, hours)
             }
           }
-
-        val locales = new ComboBox[String](countries.keys.toList.sorted) {
-          margin = Insets(10)
-          maxWidth = 209
-          value = Locale.getDefault().getDisplayCountry
+        val holidaysLabel = new Label("Holidays") {
+          margin = Insets(14, 0, 10, 134)
+        }
+        val considerHolidays: CheckBox = new CheckBox {
+          margin = Insets(14, 10, 10, 10)
+          selected = true
           onAction = _ => {
-            updateHolidays(dps, this)
+            locales.disable = !selected.value
+            updateHolidays(dps, this, locales)
             updateSum(sum, dps, hours)
           }
         }
-
-        updateHolidays(dps, locales)
 
         val fullTimeSelection = new ToggleGroup()
         val fullTime = for (i <- 1 to 2) yield
@@ -78,6 +78,17 @@ object App extends JFXApp with Calendar with HolidayCalendar {
               updateSum(sum, dps, hours)
             }
           }
+        val locales = new ComboBox[String](countries.keys.toList.sorted) {
+          margin = Insets(10, 10, 10, 200)
+          maxWidth = 209
+          value = Locale.getDefault().getDisplayCountry
+          onAction = _ => {
+            updateHolidays(dps, considerHolidays, this)
+            updateSum(sum, dps, hours)
+          }
+        }
+
+        updateHolidays(dps, considerHolidays, locales)
 
         val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
@@ -96,10 +107,10 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
         children = Seq(
           new HBox {
-            children = dps :+ locales
+            children = dps :+ holidaysLabel :+ considerHolidays
           },
           new HBox {
-            children = fullTime
+            children = fullTime :+ locales
           },
           new HBox {
             children = hours.zip(days).map(p => new VBox {
@@ -116,8 +127,10 @@ object App extends JFXApp with Calendar with HolidayCalendar {
     }
   }
 
-  private def updateHolidays(dps: Seq[DatePicker], locales: ComboBox[String]) =
-    holidays = getHolidays(dps.head.value.value, dps.last.value.value, countries(locales.value.value).getISO3Country)
+  private def updateHolidays(dps: Seq[DatePicker], considerHolidays: CheckBox, locales: ComboBox[String]) =
+    holidays = if (considerHolidays.selected.value)
+      getHolidays(dps.head.value.value, dps.last.value.value, countries(locales.value.value).getISO3Country)
+    else Right(Set())
 
   private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
     sum.text = holidays match {
