@@ -33,18 +33,6 @@ object App extends JFXApp with Calendar with HolidayCalendar {
     scene = new Scene {
       title = "Work Hours Count"
       content = new VBox {
-        val fullTimeSelection = new ToggleGroup()
-        val fullTime = for (i <- 1 to 2) yield
-          new RadioButton {
-            margin = Insets(10, 20, 20, 20)
-            text = if (i % 2 == 0) "Part time" else "Full time"
-            toggleGroup = fullTimeSelection
-            selected = i % 2 == 0
-            onAction = _ => {
-              hours.foreach(h => h.disable = text.value == "Full time")
-              updateSum(sum, dps, hours)
-            }
-          }
 
         val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
           new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
@@ -78,10 +66,19 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
         updateHolidays(dps, locales)
 
-        val sum = new Label {
-          margin = Insets(20)
-          style = "-fx-font-size: 48pt"
-        }
+        val fullTimeSelection = new ToggleGroup()
+        val fullTime = for (i <- 1 to 2) yield
+          new RadioButton {
+            margin = Insets(10, 20, 20, 20)
+            text = if (i % 2 == 0) "Part time" else "Full time"
+            toggleGroup = fullTimeSelection
+            selected = i % 2 == 0
+            onAction = _ => {
+              hours.foreach(h => h.disable = text.value == "Full time")
+              updateSum(sum, dps, hours)
+            }
+          }
+
         val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
             margin = Insets(10)
@@ -91,6 +88,11 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           }
         val days: Seq[Label] =
           for (i <- 1 to 7) yield new Label(DayOfWeek.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()))
+
+        val sum = new Label {
+          margin = Insets(20)
+          style = "-fx-font-size: 48pt"
+        }
 
         children = Seq(
           new HBox {
