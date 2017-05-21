@@ -37,6 +37,10 @@ object App extends JFXApp with Calendar with HolidayCalendar {
         val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
           new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
             margin = Insets(10)
+            tooltip = if (i % 2 == 0)
+              "Beginning of the interval"
+            else
+              "End of the interval"
             converter = new StringConverter[LocalDate] {
               private final val f = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
@@ -55,10 +59,12 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           }
         val holidaysLabel = new Label("Holidays") {
           margin = Insets(14, 0, 10, 134)
+          tooltip = "Extract national holidays from working days"
         }
         val considerHolidays: CheckBox = new CheckBox {
           margin = Insets(14, 10, 10, 10)
           selected = true
+          tooltip = "Extract national holidays from working days"
           onAction = _ => {
             locales.disable = !selected.value
             updateHolidays(dps, this, locales)
@@ -70,6 +76,8 @@ object App extends JFXApp with Calendar with HolidayCalendar {
         val fullTime = for (i <- 1 to 2) yield
           new RadioButton {
             margin = Insets(10, 20, 20, 20)
+            if (i % 2 == 1)
+              tooltip = "Use the standard full time work schedule (Mo-Fr 8 hours a day)"
             text = if (i % 2 == 0) "Part time" else "Full time"
             toggleGroup = fullTimeSelection
             selected = i % 2 == 0
@@ -80,6 +88,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           }
         val locales = new ComboBox[String](countries.keys.toList.sorted) {
           margin = Insets(10, 10, 10, 200)
+          tooltip = "Country to load national holidays for"
           maxWidth = 209
           value = Locale.getDefault().getDisplayCountry
           onAction = _ => {
@@ -93,6 +102,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
         val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
             margin = Insets(10)
+            tooltip = "Working hours for the given day of the week"
             maxWidth = 75
             onMouseClicked = _ => updateSum(sum, dps, hours)
             onKeyReleased = _ => updateSum(sum, dps, hours)
