@@ -1,4 +1,4 @@
-package com.github.yandoroshenko
+package com.github.yandoroshenko.workhourscounter
 
 import java.io.IOException
 import java.time.format.{DateTimeFormatter, TextStyle}
@@ -31,7 +31,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
   stage = new PrimaryStage {
     maximized = false
     scene = new Scene {
-      title = "Work Hours Count"
+      title = "Work Hours Counter"
       content = new VBox {
 
         val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
