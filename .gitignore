@@ -1,4 +1,7 @@
 .idea
 target/
-!target[^(*.jar)(*.desktop)(*.png)(*.svg)]
+!target/work-hours-counter*.jar
+!target/work-hours-counter.desktop
+!target/work-hours-counter.png
+!target/work-hours-counter.svg
 *.sc
