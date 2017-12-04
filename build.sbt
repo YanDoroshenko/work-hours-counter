@@ -1,12 +1,12 @@
 name := "work-hours-counter"
 
-version := "0.1"
+version := "0.1.1"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.4"
 
 libraryDependencies ++=
-  "com.typesafe.play" %% "play-json" % "2.6.0-M7" ::
-    "org.scalafx" %% "scalafx" % "8.0.102-R11" ::
+  "com.typesafe.play" %% "play-json" % "2.6.7" ::
+    "org.scalafx" %% "scalafx" % "8.0.144-R12" ::
     Nil
 
 mainClass in assembly := Some("com.github.yandoroshenko.workhourscounter.App")
