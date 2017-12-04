@@ -34,7 +34,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
       title = "Work Hours Counter"
       content = new VBox {
 
-        val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
+        private val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
           new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
             margin = Insets(10)
             tooltip = if (i % 2 == 0)
@@ -59,11 +59,11 @@ object App extends JFXApp with Calendar with HolidayCalendar {
               updateSum(sum, dps, hours)
             }
           }
-        val holidaysLabel = new Label("Holidays") {
+        private val holidaysLabel = new Label("Holidays") {
           margin = Insets(14, 0, 10, 134)
           tooltip = "Extract national holidays from working days"
         }
-        val considerHolidays: CheckBox = new CheckBox {
+        private val considerHolidays: CheckBox = new CheckBox {
           margin = Insets(14, 10, 10, 10)
           selected = true
           tooltip = "Extract national holidays from working days"
@@ -74,13 +74,14 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           }
         }
 
-        val fullTimeSelection = new ToggleGroup()
-        val fullTime = for (i <- 1 to 2) yield
+        private val fullTimeSelection = new ToggleGroup()
+        private val fullTime = for (i <- 1 to 2) yield
           new RadioButton {
             margin = Insets(10, 20, 20, 20)
             if (i % 2 == 1)
               tooltip = "Use the standard full time work schedule (Mo-Fr 8 hours a day)"
-            text = if (i % 2 == 0) "Part time" else "Full time"
+            text = if (i % 2 == 0) "Part time"
+            else "Full time"
             toggleGroup = fullTimeSelection
             selected = i % 2 == 0
             onAction = _ => {
@@ -88,7 +89,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
               updateSum(sum, dps, hours)
             }
           }
-        val locales = new ComboBox[String](countries.keys.toList.sorted) {
+        private val locales = new ComboBox[String](countries.keys.toList.sorted) {
           margin = Insets(10, 10, 10, 200)
           tooltip = "Country to load national holidays for"
           maxWidth = 209
@@ -101,7 +102,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
         updateHolidays(dps, considerHolidays, locales)
 
-        val hours: Seq[Spinner[Double]] =
+        private val hours: Seq[Spinner[Double]] =
           for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
             margin = Insets(10)
             tooltip = "Working hours for the given day of the week"
@@ -109,10 +110,10 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             onMouseClicked = _ => updateSum(sum, dps, hours)
             onKeyReleased = _ => updateSum(sum, dps, hours)
           }
-        val days: Seq[Label] =
+        private val days: Seq[Label] =
           for (i <- 1 to 7) yield new Label(DayOfWeek.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()))
 
-        val sum = new Label {
+        private val sum = new Label {
           margin = Insets(20)
           style = "-fx-font-size: 48pt"
         }
@@ -146,7 +147,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
   private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
     sum.text = holidays match {
-      case Right(hs) => {
+      case Right(hs) =>
         sum.style = "-fx-font-size: 48pt"
         sum.textFill = Color.web("#303030")
         getDays(
@@ -165,7 +166,6 @@ object App extends JFXApp with Calendar with HolidayCalendar {
           case w if w.isWhole => w.toInt.toString
           case f => f.toString
         }
-      }
       case Left(e) =>
         sum.style = null
         sum.textFill = Red
