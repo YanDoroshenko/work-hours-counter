@@ -15,6 +15,7 @@ import scalafx.scene.control._
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color._
+import scalafx.scene.text.Font
 import scalafx.util.StringConverter
 
 /**
@@ -33,10 +34,25 @@ object App extends JFXApp with Calendar with HolidayCalendar {
     scene = new Scene {
       title = "Work Hours Counter"
       content = new VBox {
-
+        private val prev = new Button("\u21e0") {
+          font = new Font(font.value.getFamily, 19)
+          padding = Insets(0, 7, 2, 7)
+          margin = Insets(10, 0, 10, 10)
+          tooltip = "Previous month"
+          onAction = _ =>
+            dps.head.value = dps.head.value.value.withDayOfMonth(1).minusMonths(1)
+        }
+        private val next = new Button("\u21e2") {
+          font = new Font(font.value.getFamily, 19)
+          padding = Insets(0, 7, 2, 7)
+          margin = Insets(10, 10, 10, 0)
+          tooltip = "Next month"
+          onAction = _ =>
+            dps.head.value = dps.head.value.value.withDayOfMonth(1).plusMonths(1)
+        }
         private val dps: Seq[DatePicker] = for (i <- 0 to 1) yield
           new DatePicker(LocalDate.now().withDayOfMonth(1).plusMonths(i).minusDays(i)) {
-            margin = Insets(10)
+            margin = Insets(10, 0, 10, i * 20)
             tooltip = if (i % 2 == 0)
               "Beginning of the interval"
             else
@@ -60,7 +76,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             }
           }
         private val holidaysLabel = new Label("Holidays") {
-          margin = Insets(14, 0, 10, 134)
+          margin = Insets(14, 0, 10, 74)
           tooltip = "Extract national holidays from working days"
         }
         private val considerHolidays: CheckBox = new CheckBox {
@@ -120,7 +136,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
         children = Seq(
           new HBox {
-            children = dps :+ holidaysLabel :+ considerHolidays
+            children = Seq(prev) ++ dps :+ next :+ holidaysLabel :+ considerHolidays
           },
           new HBox {
             children = fullTime :+ locales
