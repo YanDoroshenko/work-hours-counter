@@ -136,6 +136,8 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             children = Seq(sum)
           }
         )
+
+        updateSum(sum, dps, hours)
       }
     }
   }
