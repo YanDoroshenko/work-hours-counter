@@ -53,6 +53,8 @@ object App extends JFXApp with Calendar with HolidayCalendar {
                   null
             }
             onAction = _ => {
+              if (i == 0)
+                dps(1).value = value.value.plusMonths(1).withDayOfMonth(1).minusDays(1)
               updateHolidays(dps, considerHolidays, locales)
               updateSum(sum, dps, hours)
             }
