@@ -82,12 +82,13 @@ object App extends JFXApp with Calendar with HolidayCalendar {
         }
         private val considerHolidays: CheckBox = new CheckBox {
           margin = Insets(14, 10, 10, 10)
-          selected = true
+          selected = Holidays.get
           tooltip = "Extract national holidays from working days"
           onAction = _ => {
             locales.disable = !selected.value
             updateHolidays(dps, this, locales)
             updateSum(sum, dps, hours)
+            Holidays.put(selected.value)
           }
         }
 
@@ -100,32 +101,42 @@ object App extends JFXApp with Calendar with HolidayCalendar {
             text = if (i % 2 == 0) "Part time"
             else "Full time"
             toggleGroup = fullTimeSelection
-            selected = i % 2 == 0
+            selected = i % 2 == 0 && FullTime.get || i % 2 != 0 && !FullTime.get
             onAction = _ => {
               hours.foreach(h => h.disable = text.value == "Full time")
               updateSum(sum, dps, hours)
+              FullTime.put(i % 2 == 0)
             }
           }
         private val locales = new ComboBox[String](countries.keys.toList.sorted) {
           margin = Insets(10, 10, 10, 200)
           tooltip = "Country to load national holidays for"
           maxWidth = 209
-          value = Locale.getDefault().getDisplayCountry
+          disable = !considerHolidays.selected.value
+          value = LocalePref.get
           onAction = _ => {
             updateHolidays(dps, considerHolidays, this)
             updateSum(sum, dps, hours)
+            LocalePref.put(value.value)
           }
         }
 
         updateHolidays(dps, considerHolidays, locales)
 
         private val hours: Seq[Spinner[Double]] =
-          for (_ <- 1 to 7) yield new Spinner[Double](0, 24, 0, 0.5) {
+          for (i <- 1 to 7) yield new Spinner[Double](0, 24, DayHours(i).get, 0.5) {
             margin = Insets(10)
             tooltip = "Working hours for the given day of the week"
             maxWidth = 75
-            onMouseClicked = _ => updateSum(sum, dps, hours)
-            onKeyReleased = _ => updateSum(sum, dps, hours)
+            disable = fullTime(0).selected.value
+            onMouseClicked = _ => {
+              DayHours(i).put(value.value)
+              updateSum(sum, dps, hours)
+            }
+            onKeyReleased = _ => {
+              DayHours(i).put(value.value)
+              updateSum(sum, dps, hours)
+            }
           }
         private val days: Seq[Label] =
           for (i <- 1 to 7) yield new Label(DayOfWeek.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()))
