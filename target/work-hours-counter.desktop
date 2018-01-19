@@ -1,8 +1,8 @@
 [Desktop Entry]
-Version=1.1
+Version=1.2
 Encoding=UTF-8
 Name=Work Hours Counter
-Exec=java -jar /usr/share/work-hours-counter/work-hours-counter-1.1.jar
+Exec=java -jar /usr/share/work-hours-counter/work-hours-counter-1.2.jar
 Terminal=false
 Icon=/usr/share/work-hours-counter/work-hours-counter.png
 Type=Application
