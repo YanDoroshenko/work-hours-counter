@@ -5,7 +5,7 @@ version := "1.1"
 scalaVersion := "2.12.4"
 
 libraryDependencies ++=
-  "com.typesafe.play" %% "play-json" % "2.6.7" ::
+  "com.typesafe.play" %% "play-json" % "2.6.8" ::
     "org.scalafx" %% "scalafx" % "8.0.144-R12" ::
     Nil
 
