@@ -31,6 +31,7 @@ object App extends JFXApp with Calendar with HolidayCalendar {
 
   stage = new PrimaryStage {
     maximized = false
+    resizable = false
     scene = new Scene {
       title = "Work Hours Counter"
       content = new VBox {
