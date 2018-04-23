@@ -1,5 +1,5 @@
 .idea
-target/
+target/**
 !target/work-hours-counter*.jar
 !target/work-hours-counter.desktop
 !target/work-hours-counter.png
