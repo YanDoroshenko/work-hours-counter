@@ -2,10 +2,10 @@ name := "work-hours-counter"
 
 version := "1.2"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.5"
 
 libraryDependencies ++=
-  "com.typesafe.play" %% "play-json" % "2.6.8" ::
+  "com.typesafe.play" %% "play-json" % "2.6.9" ::
     "org.scalafx" %% "scalafx" % "8.0.144-R12" ::
     Nil
 
