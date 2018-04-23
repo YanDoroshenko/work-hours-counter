@@ -1,4 +1,4 @@
-package com.github.yandoroshenko.workhourscounter
+package com.github.yandoroshenko.workhourscounter.calendar
 
 import java.time.DayOfWeek._
 import java.time.LocalDate

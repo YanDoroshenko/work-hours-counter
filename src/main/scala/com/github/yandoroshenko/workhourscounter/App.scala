@@ -5,8 +5,9 @@ import java.time.format.{DateTimeFormatter, TextStyle}
 import java.time.{DayOfWeek, LocalDate}
 import java.util.Locale
 
+import com.github.yandoroshenko.workhourscounter.calendar.{Calendar, HolidayCalendar}
+import com.github.yandoroshenko.workhourscounter.util.{DayHours, FullTime, Holidays, LocalePref}
 import play.api.libs.json.JsResultException
-
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.{Insets, Pos}

@@ -1,6 +1,8 @@
-package com.github.yandoroshenko.workhourscounter
+package com.github.yandoroshenko.workhourscounter.util
 
 import java.util.prefs.Preferences
+
+import com.github.yandoroshenko.workhourscounter.App
 
 /**
   * Created by Yan Doroshenko (yandoroshenko@protonmail.com) on 19.01.2018.
