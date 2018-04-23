@@ -171,32 +171,46 @@ object App extends JFXApp with Calendar with HolidayCalendar {
     }
   }
 
-  private def updateHolidays(dps: Seq[DatePicker], considerHolidays: CheckBox, locales: ComboBox[String]) =
-    holidays = if (considerHolidays.selected.value)
+  private def updateHolidays(dps: Seq[DatePicker], considerHolidays: CheckBox, locales: ComboBox[String]): Unit =
+    holidays = if (considerHolidays.selected.value) {
+      log.debug("Updating holidays")
       getHolidays(dps.head.value.value, dps.last.value.value, countries(locales.value.value).getISO3Country)
-    else Right(Set())
+    }
+    else {
+      Right(Set())
+    }
 
-  private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]) =
+  private def updateSum(sum: Label, dps: Seq[DatePicker], hours: Seq[Spinner[Double]]): Unit =
     sum.text = holidays match {
       case Right(hs) =>
+        val from =dps.head.value.value
+        val to = dps.last.value.value
         sum.style = "-fx-font-size: 48pt"
         sum.textFill = Color.web("#303030")
-        getDays(
+        val s = getDays(
           dps.head.value.value, dps.last.value.value)
           .filterNot(d => hs.map(_.date).contains(d))
-          .map(d => hours(d.getDayOfWeek.getValue - 1) match {
-            case h if h.disabled.value =>
-              if (d.getDayOfWeek.getValue < 6)
-                8
-              else
-                0
-            case h => h.value.value
+          .map(d => {
+            val hs = hours(d.getDayOfWeek.getValue - 1) match {
+              case h if h.disabled.value =>
+                if (d.getDayOfWeek.getValue < 6)
+                  8
+                else
+                  0
+              case h =>
+                h.value.value
+            }
+            log.trace(f"""Counting $hs hours on $d""")
+            hs
           }
           )
           .sum match {
-          case w if w.isWhole => w.toInt.toString
+          case w if w.isWhole =>
+            w.toInt.toString
           case f => f.toString
         }
+        log.info(f"""Total hours between $from and $to: $s""")
+        s
       case Left(e) =>
         sum.style = null
         sum.textFill = Red
